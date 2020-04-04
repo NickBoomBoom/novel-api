@@ -11,9 +11,13 @@ class UsersController {
   }
 
   async add(ctx) {
-    const data = ctx.request.body
+  /* 
+   * username 用户名称不做限制
+   * password md5加密
+   */
+    const {username, password} = ctx.request.body
     // 查询是否存在相同username
-    const res = await Users.findOne({ username: data.username })
+    const res = await Users.findOne({ username})
     if (res) {
       ctx.body = {
         code: 500,
@@ -21,7 +25,8 @@ class UsersController {
       }
     } else {
       const newUser = new Users({
-        ...data,
+        username,
+        password,
         createAt: Date.now()
       })
       await newUser.save()
@@ -34,10 +39,11 @@ class UsersController {
 
   async update(ctx) {
     const { username, password, newPassword } = ctx.request.body
-    if (!newPassword) {
+
+    if (!newPassword || !username || !password) {
       ctx.body = {
         code: 500,
-        msg: 'newPassword不能为空'
+        msg: '字段缺失,请检查!'
       }
       return
     }

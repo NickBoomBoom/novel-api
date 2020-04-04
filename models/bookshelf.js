@@ -12,9 +12,9 @@ const novelsSchema = new Schema({
 })
 
 const bookshelfSchema = new Schema({
-  username: {
-    type: String,
-    required: [true, 'username不能为空'],
+  uid: {
+    type: Object,
+    required: [true, 'uid不能为空'],
   },
   novels: [novelsSchema]
 })

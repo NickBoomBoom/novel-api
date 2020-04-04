@@ -1,17 +1,7 @@
 const Bookshelfs = require('../models/bookshelf');
 const Users = require('../models/users');
-const jwt = require('jsonwebtoken');
-const config = require('../config')
+const {checkLogin} = require('../utils')
 
-const checkLogin = ctx => {
-  const token = ctx.cookies.get(config.cookieTokenKey)
-  if (!token) {
-    return null
-  }
-  const userInfo = jwt.verify(token, config.secretOrPrivateKey)
-  return userInfo
-
-}
 class BookshelfsController {
   // 找寻用户书单
   async findBookshlef(ctx) {
@@ -26,18 +16,17 @@ class BookshelfsController {
       return
     }
 
-    const { username } = userInfo
+    const { _id:uid } = userInfo
     const res = await Bookshelfs.find({
-      username
+      uid
     })
-    console.log(res, username)
     ctx.body = {
       code: 200,
       data: res.map(t => t.novels)
     }
   }
 
-  // 更新用户书单,无则新建
+  // 更新用户书单,无则新建,根据用户_id 为 uid 绑定数据信息
   async update(ctx) {
     const userInfo = checkLogin(ctx)
     if (!userInfo) {
@@ -49,16 +38,16 @@ class BookshelfsController {
       return
     }
 
-    const data = ctx.request.body
-    const { username } = userInfo
-    const { list } = data
+    const {list} = ctx.request.body
+    const { _id } = userInfo
 
     // 检测该用户是否存在
-    const currentUser = await Users.findOne({ username })
+    const currentUser = await Users.findOne({ _id })
+
     if (currentUser) {
       await Bookshelfs.update(
-        { username },
-        { username, novels: list },
+        { uid:_id },
+        { uid:_id, novels: list },
         {
           upsert: true,
           runValidators: true,
