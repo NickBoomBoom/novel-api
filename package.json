@@ -23,7 +23,7 @@
     "koa2-cors": "^2.0.6",
     "mongodb": "^3.5.4",
     "mongoose": "^5.9.3",
-    "pug": "~2.0.0-beta11"
+    "pug": "~3.0.1"
   },
   "devDependencies": {
     "babel-eslint": "7.1.1",
